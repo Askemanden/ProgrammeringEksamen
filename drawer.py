@@ -1,8 +1,9 @@
 from dataclasses import dataclass, field
-from typing import Tuple
+from typing import Tuple, List
 import pygame
+from Board import BoardSpace
 
-def make_checkerboard(img_path1: str, img_path2: str, tiles_x: int, tiles_y: int) -> pygame.Surface:
+def _make_checkerboard(img_path1: str, img_path2: str, tiles_x: int, tiles_y: int) -> pygame.Surface:
 
     img1 = pygame.image.load(img_path1).convert_alpha()
     img2 = pygame.image.load(img_path2).convert_alpha()
@@ -26,69 +27,108 @@ def make_checkerboard(img_path1: str, img_path2: str, tiles_x: int, tiles_y: int
 
 @dataclass
 class Drawer:
-    screen: pygame.Surface
-    x: int
-    y: int
-    width: int
-    height: int
-    board_texture: pygame.Surface = field(default_factory=lambda : make_checkerboard("resources/imgs/dark.png","resources/imgs/light.png",tiles_x=10,tiles_y=10), init = False)
+    stone_scale: float
+    board_width: int
+    board_height: int
+    board_texture: pygame.Surface = field(init = False)
+    white_stone: pygame.Surface = field(default_factory=lambda: pygame.image.load("resources/imgs/black.png").convert_alpha(), init=False)
+    black_stone: pygame.Surface = field(default_factory=lambda: pygame.image.load("resources/imgs/white.png").convert_alpha(), init=False)
 
-    @property
-    def coordinates(self) -> Tuple[int, int]:
-        return (self.x, self.y)
-
-    @coordinates.setter
-    def coordinates(self, value: Tuple[int, int]) -> None:
-        self.x, self.y = value
+    def __post_init__(self):
+        self.board_texture = _make_checkerboard(
+            "resources/imgs/dark.png",
+            "resources/imgs/light.png",
+            self.board_width,
+            self.board_height
+            )
     
     @property
     def rect(self) -> Tuple[int, int]:
-        return (self.width, self.height)
+        return (self.board_width, self.board_height)
 
     @rect.setter
-    def coordinates(self, value: Tuple[int, int]) -> None:
-        self.width, self.height = value
+    def rect(self, value: Tuple[int, int]) -> None:
+        self.board_width, self.board_height = value
     
-    def draw(self, board_state : List[List[BoardSpace]]) -> None:
-        scaled = pygame.transform.smoothscale(surface=self.board_texture, self.rect)
-        screen.blit(scaled, self.coordinates)
+    def draw(self, board_state: List[List[BoardSpace]], rect: Tuple[int,int], pos: Tuple[int,int], screen: pygame.Surface) -> None:
+        width,height = rect
+        if len(board_state) != self.board_height:
+            print("board_state not correct height")
+            return
+        if len(board_state[0]) != self.board_width:
+            print("board_state not correct width")
+            return
+
+        temp_surface = pygame.Surface(self.board_texture.get_size(), pygame.SRCALPHA)
+
+        temp_surface.blit(self.board_texture, (0,0))
+
+        tile_w = self.board_texture.get_width() // self.board_width
+        tile_h = self.board_texture.get_height() // self.board_height
+
+        stone_black = pygame.transform.smoothscale(self.black_stone, (tile_w*self.stone_scale, tile_h*self.stone_scale))
+        stone_white = pygame.transform.smoothscale(self.white_stone, (tile_w*self.stone_scale, tile_h*self.stone_scale))
+
+        for row in range(self.board_height):
+            for col in range(self.board_width):
+                space = board_state[row][col]
+
+                if space == BoardSpace.EMPTY:
+                    continue
+
+                px = col * tile_w
+                py = row * tile_h
+
+                if space == BoardSpace.BLACK:
+                    temp_surface.blit(stone_black, (px + (tile_w - tile_w*self.stone_scale)/2, py + (tile_h - tile_h*self.stone_scale)/2))
+                elif space == BoardSpace.WHITE:
+                    temp_surface.blit(stone_white, (px + (tile_w - tile_w*self.stone_scale)/2, py + (tile_h - tile_h*self.stone_scale)/2))
+
+        scaled = pygame.transform.smoothscale(temp_surface, (width, height))
+
+        screen.blit(scaled, pos)
 
 
+if __name__ == "__main__":
+    import pygame
+    from Board import BoardSpace
 
+    pygame.init()
 
+    # Create window
+    screen = pygame.display.set_mode((600, 600))
+    clock = pygame.time.Clock()
 
+    # Create a Drawer at position (100, 100)
+    drawer = Drawer(
+        stone_scale=0.9,
+        board_width=9,      # number of tiles horizontally
+        board_height=9      # number of tiles vertically
+    )
 
+    # Example 9×9 board with some stones
+    board_state = [
+        [BoardSpace.EMPTY] *9 for _ in range(9)
+    ]
 
+    # Place a few stones for testing
+    board_state[0][0] = BoardSpace.BLACK
+    board_state[0][1] = BoardSpace.WHITE
+    board_state[4][4] = BoardSpace.BLACK
+    board_state[8][8] = BoardSpace.WHITE
 
-pygame.init()
+    running = True
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
 
-screen = pygame.display.set_mode((800, 800))
-clock = pygame.time.Clock()
+        screen.fill((30, 30, 30))
 
-checker = 
+        # Draw board + stones
+        drawer.draw(board_state, (500,500),(50,50), screen)
 
-# Desired on‑screen size
-DISPLAY_SIZE = 600
+        pygame.display.flip()
+        clock.tick(60)
 
-running = True
-while running:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
-
-    screen.fill((40, 40, 40))
-
-    # Scale the checkerboard to 600×600 for display
-    scaled = pygame.transform.smoothscale(surface=checker, (DISPLAY_SIZE, DISPLAY_SIZE))
-
-    # Center it on the screen
-    x = (800 - DISPLAY_SIZE) // 2
-    y = (800 - DISPLAY_SIZE) // 2
-
-    screen.blit(scaled, (x, y))
-
-    pygame.display.flip()
-    clock.tick(60)
-
-pygame.quit()
-
+    pygame.quit()
