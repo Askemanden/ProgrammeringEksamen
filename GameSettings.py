@@ -1,3 +1,3 @@
 class GameSettings:
-    def __init__(self, size : int) -> None:
-        self.number_of_tiles : int = size
+    def __init__(self, board_size : int) -> None:
+        self.board_size : int = board_size
