@@ -1,5 +1,5 @@
 from typing import List
-from GameSettings import GameSettings as _GameSettings
+from gameSettings import GameSettings as _GameSettings
 from enum import Enum
 
 class BoardSpace(Enum):

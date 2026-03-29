@@ -1,47 +1,89 @@
+from __future__ import annotations
 from dataclasses import dataclass, field
-from typing import Tuple, List
+from typing import Tuple
 import pygame
-from Board import BoardSpace
+from board import BoardSpace, Board
 
-def _make_checkerboard(img_path1: str, img_path2: str, tiles_x: int, tiles_y: int) -> pygame.Surface:
 
-    img1 = pygame.image.load(img_path1).convert_alpha()
-    img2 = pygame.image.load(img_path2).convert_alpha()
 
-    w1, h1 = img1.get_size()
-    w2, h2 = img2.get_size()
+def _make_goboard(
+    img_path: str,
+    tiles_x: int,
+    tiles_y: int,
+    margin: int
+) -> Tuple[pygame.Surface, float, float, float, float, int]:
+    """
+    Create a Go board texture using a wood background and straight black grid lines.
+    Returns:
+        (surface, first_x, first_y, cell_w, cell_h, line_thickness)
+    """
 
-    if (w1, h1) != (w2, h2):
-        raise ValueError("Both tile images must be the same size")
+    wood = pygame.image.load(img_path).convert_alpha()
+    width, height = wood.get_size()
 
-    tile_w, tile_h = w1, h1
+    surface = pygame.Surface((width, height), pygame.SRCALPHA)
+    surface.blit(wood, (0, 0))
 
-    surface = pygame.Surface((tiles_x * tile_w, tiles_y * tile_h), pygame.SRCALPHA)
+    first_x = float(margin)
+    first_y = float(margin)
 
+    inner_w = width - 2 * margin
+    inner_h = height - 2 * margin
+
+    cell_w = inner_w / (tiles_x - 1)
+    cell_h = inner_h / (tiles_y - 1)
+
+    line_color = (0, 0, 0)
+    line_thickness = 2
+
+    # Vertical lines
+    for x in range(tiles_x):
+        px = int(first_x + x * cell_w)
+        pygame.draw.line(surface, line_color, (px, first_y), (px, height - first_y), line_thickness)
+
+    # Horizontal lines
     for y in range(tiles_y):
-        for x in range(tiles_x):
-            tile = img1 if ((x + y) % 2 == 0) else img2
-            surface.blit(tile, (x * tile_w, y * tile_h))
+        py = int(first_y + y * cell_h)
+        pygame.draw.line(surface, line_color, (first_x, py), (width - first_x, py), line_thickness)
 
-    return surface
+    return surface, first_x, first_y, cell_w, cell_h, line_thickness
 
 @dataclass
 class Drawer:
-    stone_scale: float
     board_width: int
     board_height: int
-    board_texture: pygame.Surface = field(init = False)
-    white_stone: pygame.Surface = field(default_factory=lambda: pygame.image.load("resources/imgs/black.png").convert_alpha(), init=False)
-    black_stone: pygame.Surface = field(default_factory=lambda: pygame.image.load("resources/imgs/white.png").convert_alpha(), init=False)
+    stone_scale: float = 1
+    margin: int = 40
 
-    def __post_init__(self):
-        self.board_texture = _make_checkerboard(
-            "resources/imgs/dark.png",
-            "resources/imgs/light.png",
+    board_texture: pygame.Surface = field(init=False)
+    first_x: float = field(init=False)
+    first_y: float = field(init=False)
+    cell_w: float = field(init=False)
+    cell_h: float = field(init=False)
+    line_thickness: int = field(init=False)
+
+    white_stone: pygame.Surface = field(
+        default_factory=lambda: pygame.image.load("resources/imgs/white.png").convert_alpha(),
+        init=False
+    )
+    black_stone: pygame.Surface = field(
+        default_factory=lambda: pygame.image.load("resources/imgs/black.png").convert_alpha(),
+        init=False
+    )
+
+    def __post_init__(self) -> None:
+        (self.board_texture,
+         self.first_x,
+         self.first_y,
+         self.cell_w,
+         self.cell_h,
+         self.line_thickness) = _make_goboard(
+            "resources/imgs/wood.png",
             self.board_width,
-            self.board_height
-            )
-    
+            self.board_height,
+            self.margin
+        )
+
     @property
     def rect(self) -> Tuple[int, int]:
         return (self.board_width, self.board_height)
@@ -49,84 +91,94 @@ class Drawer:
     @rect.setter
     def rect(self, value: Tuple[int, int]) -> None:
         self.board_width, self.board_height = value
-    
-    def draw(self, board_state: List[List[BoardSpace]], rect: Tuple[int,int], pos: Tuple[int,int], screen: pygame.Surface) -> None:
-        width,height = rect
-        if len(board_state) != self.board_height:
-            print("board_state not correct height")
-            return
-        if len(board_state[0]) != self.board_width:
-            print("board_state not correct width")
-            return
 
-        temp_surface = pygame.Surface(self.board_texture.get_size(), pygame.SRCALPHA)
+    def draw(
+        self,
+        board: Board,
+        rect: Tuple[int, int],
+        pos: Tuple[int, int],
+        screen: pygame.Surface
+    ) -> None:
 
-        temp_surface.blit(self.board_texture, (0,0))
+        board_state = board.board_tiles
+        out_w, out_h = rect
 
-        tile_w = self.board_texture.get_width() // self.board_width
-        tile_h = self.board_texture.get_height() // self.board_height
+        tex_w = self.board_texture.get_width()
+        tex_h = self.board_texture.get_height()
 
-        stone_black = pygame.transform.smoothscale(self.black_stone, (tile_w*self.stone_scale, tile_h*self.stone_scale))
-        stone_white = pygame.transform.smoothscale(self.white_stone, (tile_w*self.stone_scale, tile_h*self.stone_scale))
+        temp_surface = pygame.Surface((tex_w, tex_h), pygame.SRCALPHA)
+        temp_surface.blit(self.board_texture, (0, 0))
 
+        # Stone size in native space
+        stone_w = int(self.cell_w * self.stone_scale)
+        stone_h = int(self.cell_h * self.stone_scale)
+
+        stone_black = pygame.transform.smoothscale(self.black_stone, (stone_w, stone_h))
+        stone_white = pygame.transform.smoothscale(self.white_stone, (stone_w, stone_h))
+
+        # The visual center of a line is shifted by half the thickness
+        line_offset = self.line_thickness / 2
+
+        # Draw stones
         for row in range(self.board_height):
             for col in range(self.board_width):
                 space = board_state[row][col]
-
                 if space == BoardSpace.EMPTY:
                     continue
 
-                px = col * tile_w
-                py = row * tile_h
+                px = self.first_x + col * self.cell_w + line_offset
+                py = self.first_y + row * self.cell_h + line_offset
+
+                draw_x = px - stone_w / 2
+                draw_y = py - stone_h / 2
 
                 if space == BoardSpace.BLACK:
-                    temp_surface.blit(stone_black, (px + (tile_w - tile_w*self.stone_scale)/2, py + (tile_h - tile_h*self.stone_scale)/2))
-                elif space == BoardSpace.WHITE:
-                    temp_surface.blit(stone_white, (px + (tile_w - tile_w*self.stone_scale)/2, py + (tile_h - tile_h*self.stone_scale)/2))
+                    temp_surface.blit(stone_black, (draw_x, draw_y))
+                else:
+                    temp_surface.blit(stone_white, (draw_x, draw_y))
 
-        scaled = pygame.transform.smoothscale(temp_surface, (width, height))
-
+        scaled = pygame.transform.smoothscale(temp_surface, (out_w, out_h))
         screen.blit(scaled, pos)
 
 
-if __name__ == "__main__":
-    import pygame
-    from Board import BoardSpace
 
+if __name__ == "__main__":
+    from gameSettings import GameSettings
+    import random
     pygame.init()
 
-    # Create window
-    screen = pygame.display.set_mode((600, 600))
-    clock = pygame.time.Clock()
+    WIDTH, HEIGHT = 800, 800
+    screen = pygame.display.set_mode((WIDTH, HEIGHT))
+    pygame.display.set_caption("Go Board Test")
 
-    # Create a Drawer at position (100, 100)
+    s = 19
+    board = Board(GameSettings(s))
+
+    for i in range(s):
+        for j in range(s):
+            board.board_tiles[i][j] = random.choice([BoardSpace.BLACK,BoardSpace.WHITE])
+
     drawer = Drawer(
-        stone_scale=0.9,
-        board_width=9,      # number of tiles horizontally
-        board_height=9      # number of tiles vertically
+        board_width=s,
+        board_height=s
     )
 
-    # Example 9×9 board with some stones
-    board_state = [
-        [BoardSpace.EMPTY] *9 for _ in range(9)
-    ]
-
-    # Place a few stones for testing
-    board_state[0][0] = BoardSpace.BLACK
-    board_state[0][1] = BoardSpace.WHITE
-    board_state[4][4] = BoardSpace.BLACK
-    board_state[8][8] = BoardSpace.WHITE
-
+    clock = pygame.time.Clock()
     running = True
+
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
 
-        screen.fill((30, 30, 30))
+        screen.fill((50, 50, 50))
 
-        # Draw board + stones
-        drawer.draw(board_state, (500,500),(50,50), screen)
+        drawer.draw(
+            board=board,
+            rect=(WIDTH - 40, HEIGHT - 40),
+            pos=(20, 20),
+            screen=screen
+        )
 
         pygame.display.flip()
         clock.tick(60)
