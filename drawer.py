@@ -88,9 +88,24 @@ class Drawer:
     def rect(self) -> Tuple[int, int]:
         return (self.board_width, self.board_height)
 
-    @rect.setter
-    def rect(self, value: Tuple[int, int]) -> None:
-        self.board_width, self.board_height = value
+    def board_to_global(self, row: int, col: int) -> Tuple[float, float]:
+        """
+        Convert board coordinates (row, col) to global screen coordinates.
+        """
+        line_offset = self.line_thickness / 2
+        x_global = self.first_x + col * self.cell_w + line_offset
+        y_global = self.first_y + row * self.cell_h + line_offset
+        return x_global, y_global
+
+    def global_to_board(self, x_global: float, y_global: float) -> Tuple[int, int]:
+        """
+        Convert global screen coordinates to board coordinates (row, col).
+        Returns the nearest board position.
+        """
+        line_offset = self.line_thickness / 2
+        col = round((x_global - self.first_x - line_offset) / self.cell_w)
+        row = round((y_global - self.first_y - line_offset) / self.cell_h)
+        return row, col
 
     def draw(
         self,
@@ -116,9 +131,6 @@ class Drawer:
         stone_black = pygame.transform.smoothscale(self.black_stone, (stone_w, stone_h))
         stone_white = pygame.transform.smoothscale(self.white_stone, (stone_w, stone_h))
 
-        # The visual center of a line is shifted by half the thickness
-        line_offset = self.line_thickness / 2
-
         # Draw stones
         for row in range(self.board_height):
             for col in range(self.board_width):
@@ -126,8 +138,7 @@ class Drawer:
                 if space == BoardSpace.EMPTY:
                     continue
 
-                px = self.first_x + col * self.cell_w + line_offset
-                py = self.first_y + row * self.cell_h + line_offset
+                px, py = self.board_to_global(row, col)
 
                 draw_x = px - stone_w / 2
                 draw_y = py - stone_h / 2
