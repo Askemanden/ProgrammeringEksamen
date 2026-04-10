@@ -15,7 +15,6 @@ class Game:
 
         self.current_turn : Player = Player.EMPTY
         self.last_turn : Player = Player.EMPTY
-        self.unresolved_action : bool = False
 
         self.player_actions.connect(lambda position: self.__on_player_action(position))
     
@@ -31,10 +30,13 @@ class Game:
         if not placed:
             return
         
+        self.board.check_captures()
+        
         self.last_turn = self.current_turn
 
         self.current_turn = Player.BLACK if self.current_turn == Player.WHITE else Player.WHITE
-        self.unresolved_action = True
-    
+
+
+
     def pause_unpause(self) -> None:
         self.current_turn = Player.EMPTY if self.current_turn != Player.EMPTY else self.last_turn
