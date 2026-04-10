@@ -7,6 +7,11 @@ class BoardSpace(Enum):
     BLACK = 2
     EMPTY = 3
 
+class BoardPosition:
+    def __init__(self, x : int, y : int):
+        self.x = x
+        self.y = y
+
 class Board:
     def __init__(self, settings : _GameSettings) -> None:
         self.settings : _GameSettings = settings
@@ -25,11 +30,28 @@ class Board:
         return columns
 
     def __out_of_bounds(self, x : int, y: int) -> bool:
-        if x < 0 or x > self.settings.board_size:
+        if x < 0 or x > self.settings.board_size - 1:
             return True
-        if y < 0 or y > self.settings.board_size:
+        if y < 0 or y > self.settings.board_size - 1:
             return True
         return False
+    
+    def __check_legality(self, x : int, y : int, colour : BoardSpace) -> bool:
+        return True
+
+    def __check_captures(self, x : int, y : int, colour : BoardSpace) -> bool:
+        if (self.__out_of_bounds(x, y)):
+            return False
+        # Ånde-først søgealgoritme
+        
+        BoardPosition : source(x, y)
+
+        queueueueueueue : List[Tuple[int, int]] = []
+        visited : List[Tuple[int, int]] = []
+
+
+    
+        return True
 
     def place_stone(self, x : int, y : int, stone : BoardSpace) -> bool:
         if (self.__out_of_bounds(x, y)):
