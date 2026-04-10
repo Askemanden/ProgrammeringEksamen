@@ -36,8 +36,7 @@ class Board:
             return False
         if self.board_tiles[x][y] != BoardSpace.EMPTY:
             return False
-        else:
-            self.board_tiles[x][y] = stone
+        self.board_tiles[x][y] = stone
         self.last_placed_stone = (stone,(x,y))
         return True
 
