@@ -2,14 +2,17 @@ from board import Board
 from signals import Signal
 from typing import Tuple
 from board import BoardSpace
+from drawer import Drawer
 
 Player = BoardSpace
 
 class Game:
 
-    def __init__(self, board: Board, player_actions: Signal[Tuple[int,int]]) -> None:
+    def __init__(self, board: Board, drawer: Drawer, player_actions: Signal[Tuple[int,int]]) -> None:
         self.board = board
+        self.drawer = drawer
         self.player_actions = player_actions
+
         self.current_turn : Player = Player.EMPTY
         self.last_turn : Player = Player.EMPTY
         self.unresolved_action : bool = False
@@ -21,9 +24,10 @@ class Game:
         if self.current_turn == Player.EMPTY:
             return
 
+        position = self.drawer.global_to_board(position[0],position[1])
+
         placed = self.board.place_stone(position[0],position[1],self.current_turn)
         
-
         if not placed:
             return
         
@@ -31,9 +35,6 @@ class Game:
 
         self.current_turn = Player.BLACK if self.current_turn == Player.WHITE else Player.WHITE
         self.unresolved_action = True
-
-
-
     
     def pause_unpause(self) -> None:
         self.current_turn = Player.EMPTY if self.current_turn != Player.EMPTY else self.last_turn
