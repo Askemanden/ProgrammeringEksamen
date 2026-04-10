@@ -1,7 +1,6 @@
-from board import Board
+from board import Board, BoardSpace
 from signals import Signal
 from typing import Tuple
-from board import BoardSpace
 from drawer import Drawer
 
 Player = BoardSpace
