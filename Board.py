@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Tuple
 from gameSettings import GameSettings as _GameSettings
 from enum import Enum
 
@@ -12,6 +12,8 @@ class Board:
         self.settings : _GameSettings = settings
 
         self.board_tiles : List[List[BoardSpace]] = self.__populate_board_tiles()
+
+        self.last_placed_stone : Tuple[BoardSpace, Tuple[int,int]] = (BoardSpace.EMPTY,(0,0))
 
     def __populate_board_tiles(self) -> List[List[BoardSpace]]:
         columns : List[List[BoardSpace]] = []
@@ -36,6 +38,7 @@ class Board:
             return False
         else:
             self.board_tiles[x][y] = stone
+        self.last_placed_stone = (stone,(x,y))
         return True
 
     def remove_stone(self, x : int, y : int) -> bool:
@@ -43,6 +46,9 @@ class Board:
             return False
         self.board_tiles[x][y] = BoardSpace.EMPTY
         return True
+
+    def check_captures(self):...
+
     
 # Kodegravplads
 
