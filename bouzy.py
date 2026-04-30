@@ -18,7 +18,7 @@ class BouzyAlgorithm:
     @staticmethod
     def evaluate_values(
         board: Board,
-        dilations: int = 21,
+        dilations: int = 5,
         erosions: Optional[int] = None
     ) -> List[List[int]]:
         """
@@ -43,7 +43,7 @@ class BouzyAlgorithm:
     @staticmethod
     def evaluate_territory_board(
         board: Board,
-        dilations: int = 21,
+        dilations: int = 5,
         erosions: Optional[int] = None
     ) -> Board:
         """
@@ -373,15 +373,14 @@ if __name__ == "__main__":
     values: List[List[int]] = (
         BouzyAlgorithm.evaluate_values(
             board,
-            dilations=4
+            dilations=21
         )
     )
 
     territory_board: Board = (
         BouzyAlgorithm.evaluate_territory_board(
             board=board,
-            dilations=21,
-            erosions=5
+            dilations=21
         )
     )
 

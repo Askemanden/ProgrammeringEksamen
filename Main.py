@@ -19,6 +19,7 @@ if __name__ == "__main__":
     pg.display.set_caption("Tingeling")
     clock = pg.time.Clock()
     board_size = 19
+
     settings = GameSettings(board_size)
     drawer = Drawer(board_size,board_size,(WINDOW_HEIGHT-100,WINDOW_HEIGHT-100),(50,50), margin=50)
     board = Board(settings)

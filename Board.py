@@ -34,24 +34,7 @@ class Board:
             return True
         if y < 0 or y > self.settings.board_size - 1:
             return True
-        return False
-    
-    def __check_legality(self, x : int, y : int, colour : BoardSpace) -> bool:
-        return True
-
-    def __check_captures(self, x : int, y : int, colour : BoardSpace) -> bool:
-        if (self.__out_of_bounds(x, y)):
-            return False
-        # Ånde-først søgealgoritme
-        
-        BoardPosition : source(x, y)
-
-        queueueueueueue : List[Tuple[int, int]] = []
-        visited : List[Tuple[int, int]] = []
-
-
-    
-        return True
+        return False    
 
     def place_stone(self, x : int, y : int, stone : BoardSpace) -> bool:
         if (self.__out_of_bounds(x, y)):
