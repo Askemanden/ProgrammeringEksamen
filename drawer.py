@@ -52,6 +52,9 @@ def _make_goboard(
 class Drawer:
     board_width: int
     board_height: int
+    rect: Tuple[int, int]
+    pos: Tuple[int, int]
+
     stone_scale: float = 1
     margin: int = 40
 
@@ -84,52 +87,89 @@ class Drawer:
             self.margin
         )
 
-    @property
-    def rect(self) -> Tuple[int, int]:
-        return (self.board_width, self.board_height)
-
     def board_to_global(self, row: int, col: int) -> Tuple[float, float]:
         """
-        Convert board coordinates (row, col) to global screen coordinates.
+        Convert board coordinates (row, col) to global screen coordinates for stone drawing.
+        Returns the top-left position for blitting the stone image on screen.
         """
+        rect = self.rect
+        pos = self.pos
+        out_w, out_h = rect
+        tex_w = self.board_texture.get_width()
+        tex_h = self.board_texture.get_height()
+        scale_x = out_w / tex_w
+        scale_y = out_h / tex_h
+
+        # Stone size in native space
+        stone_w = self.cell_w * self.stone_scale
+        stone_h = self.cell_h * self.stone_scale
         line_offset = self.line_thickness / 2
-        x_global = self.first_x + col * self.cell_w + line_offset
-        y_global = self.first_y + row * self.cell_h + line_offset
-        return x_global, y_global
+        px = self.first_x + col * self.cell_w + line_offset
+        py = self.first_y + row * self.cell_h + line_offset
+        native_draw_x = px - stone_w / 2
+        native_draw_y = py - stone_h / 2
+
+        # Scale to screen coordinates
+        screen_draw_x = native_draw_x * scale_x + pos[0]
+        screen_draw_y = native_draw_y * scale_y + pos[1]
+        return screen_draw_x, screen_draw_y
 
     def global_to_board(self, x_global: float, y_global: float) -> Tuple[int, int]:
         """
-        Convert global screen coordinates to board coordinates (row, col).
+        Convert global screen coordinates (top-left of stone) to board coordinates (row, col).
         Returns the nearest board position.
         """
+        rect = self.rect
+        pos = self.pos
+        out_w, out_h = rect
+        tex_w = self.board_texture.get_width()
+        tex_h = self.board_texture.get_height()
+        scale_x = out_w / tex_w
+        scale_y = out_h / tex_h
+
+        # Unscale to native coordinates
+        native_x = (x_global - pos[0]) / scale_x
+        native_y = (y_global - pos[1]) / scale_y
+
+        # Adjust for stone center
+        px = native_x
+        py = native_y
         line_offset = self.line_thickness / 2
-        col = round((x_global - self.first_x - line_offset) / self.cell_w)
-        row = round((y_global - self.first_y - line_offset) / self.cell_h)
+        col = round((px - self.first_x - line_offset) / self.cell_w)
+        row = round((py - self.first_y - line_offset) / self.cell_h)
         return row, col
 
     def draw(
         self,
         board: Board,
-        rect: Tuple[int, int],
-        pos: Tuple[int, int],
-        screen: pygame.Surface
+        screen: pygame.Surface,
+        hover_coords: Tuple[int,int],
+        color: BoardSpace
     ) -> None:
-
+        rect = self.rect
+        pos = self.pos
         board_state = board.board_tiles
         out_w, out_h = rect
 
+        # Draw the scaled board background
+        scaled_board = pygame.transform.smoothscale(self.board_texture, (out_w, out_h))
+        screen.blit(scaled_board, pos)
+
+        # Compute scaling factors
         tex_w = self.board_texture.get_width()
         tex_h = self.board_texture.get_height()
+        scale_x = out_w / tex_w
+        scale_y = out_h / tex_h
 
-        temp_surface = pygame.Surface((tex_w, tex_h), pygame.SRCALPHA)
-        temp_surface.blit(self.board_texture, (0, 0))
+        # Stone sizes in screen space
+        stone_w_native = self.cell_w * self.stone_scale
+        stone_h_native = self.cell_h * self.stone_scale
+        stone_w_screen = stone_w_native * scale_x
+        stone_h_screen = stone_h_native * scale_y
 
-        # Stone size in native space
-        stone_w = int(self.cell_w * self.stone_scale)
-        stone_h = int(self.cell_h * self.stone_scale)
-
-        stone_black = pygame.transform.smoothscale(self.black_stone, (stone_w, stone_h))
-        stone_white = pygame.transform.smoothscale(self.white_stone, (stone_w, stone_h))
+        # Scale stone images
+        stone_black_screen = pygame.transform.smoothscale(self.black_stone, (int(stone_w_screen), int(stone_h_screen)))
+        stone_white_screen = pygame.transform.smoothscale(self.white_stone, (int(stone_w_screen), int(stone_h_screen)))
 
         # Draw stones
         for row in range(self.board_height):
@@ -138,18 +178,31 @@ class Drawer:
                 if space == BoardSpace.EMPTY:
                     continue
 
-                px, py = self.board_to_global(row, col)
-
-                draw_x = px - stone_w / 2
-                draw_y = py - stone_h / 2
+                screen_draw_x, screen_draw_y = self.board_to_global(row, col)
 
                 if space == BoardSpace.BLACK:
-                    temp_surface.blit(stone_black, (draw_x, draw_y))
+                    screen.blit(stone_black_screen, (screen_draw_x, screen_draw_y))
                 else:
-                    temp_surface.blit(stone_white, (draw_x, draw_y))
+                    screen.blit(stone_white_screen, (screen_draw_x, screen_draw_y))
 
-        scaled = pygame.transform.smoothscale(temp_surface, (out_w, out_h))
-        screen.blit(scaled, pos)
+        # Draw hover stone if color is not EMPTY
+        if color != BoardSpace.EMPTY:
+            hover_row, hover_col = hover_coords
+            board_x, board_y = self.global_to_board(hover_row, hover_col)
+            
+            # Check if board coordinates are within bounds
+            if 0 <= board_x < self.board_height and 0 <= board_y < self.board_width:
+                if board.board_tiles[board_x][board_y] == BoardSpace.EMPTY:
+                    screen_draw_x, screen_draw_y = self.board_to_global(board_x, board_y)
+                    
+                    # Create semi-transparent stone
+                    if color == BoardSpace.BLACK:
+                        hover_stone = stone_black_screen.copy()
+                    else:
+                        hover_stone = stone_white_screen.copy()
+
+                    hover_stone.set_alpha(200)
+                    screen.blit(hover_stone, (screen_draw_x, screen_draw_y))
 
 
 
@@ -171,7 +224,9 @@ if __name__ == "__main__":
 
     drawer = Drawer(
         board_width=s,
-        board_height=s
+        board_height=s,
+        rect=(WIDTH - 40, HEIGHT - 40),
+        pos=(20, 20),
     )
 
     clock = pygame.time.Clock()
@@ -186,9 +241,9 @@ if __name__ == "__main__":
 
         drawer.draw(
             board=board,
-            rect=(WIDTH - 40, HEIGHT - 40),
-            pos=(20, 20),
-            screen=screen
+            screen=screen,
+            hover_coords=(0,0),
+            color=BoardSpace.EMPTY
         )
 
         pygame.display.flip()

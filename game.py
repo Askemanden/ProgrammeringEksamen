@@ -29,8 +29,6 @@ class Game:
         if not placed:
             return
         
-        self.board.check_captures()
-        
         self.last_turn = self.current_turn
 
         self.current_turn = Player.BLACK if self.current_turn == Player.WHITE else Player.WHITE
@@ -39,3 +37,7 @@ class Game:
 
     def pause_unpause(self) -> None:
         self.current_turn = Player.EMPTY if self.current_turn != Player.EMPTY else self.last_turn
+
+    def start_game(self) -> None:
+        self.current_turn = Player.BLACK
+        self.last_turn = Player.WHITE
