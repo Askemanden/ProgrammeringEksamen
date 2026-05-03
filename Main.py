@@ -3,7 +3,7 @@ import pygame as pg
 from signals import Signal
 from typing import Tuple, List
 from drawer import Drawer
-from board import Board, specielt_bræt
+from Board import Board, specielt_bræt
 from gameSettings import GameSettings
 from game import Game
 from game import States

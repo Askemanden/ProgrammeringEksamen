@@ -1,6 +1,6 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
-from typing import Tuple
+from typing import Tuple, Optional, Set, List
 import pygame
 from board import BoardSpace, Board
 
@@ -56,6 +56,7 @@ class Drawer:
     pos: Tuple[int, int]
 
     stone_scale: float = 1
+    territory_indicator_scale: float = 0.6
     margin: int = 40
 
     board_texture: pygame.Surface = field(init=False)
@@ -139,17 +140,45 @@ class Drawer:
         row = round((py - self.first_y - line_offset) / self.cell_h)
         return row, col
 
+    def board_to_global_scaled(
+        self,
+        row: int,
+        col: int,
+        scale: float
+    ) -> Tuple[float, float]:
+        rect = self.rect
+        pos = self.pos
+        out_w, out_h = rect
+        tex_w = self.board_texture.get_width()
+        tex_h = self.board_texture.get_height()
+        scale_x = out_w / tex_w
+        scale_y = out_h / tex_h
+
+        stone_w = self.cell_w * scale
+        stone_h = self.cell_h * scale
+        line_offset = self.line_thickness / 2
+        px = self.first_x + col * self.cell_w + line_offset
+        py = self.first_y + row * self.cell_h + line_offset
+        native_draw_x = px - stone_w / 2
+        native_draw_y = py - stone_h / 2
+
+        screen_draw_x = native_draw_x * scale_x + pos[0]
+        screen_draw_y = native_draw_y * scale_y + pos[1]
+        return screen_draw_x, screen_draw_y
+
     def draw(
         self,
         board: Board,
         screen: pygame.Surface,
         hover_coords: Tuple[int,int],
-        color: BoardSpace
+        hover_color: BoardSpace,
+        territory_indicator: Optional[Board] = None
     ) -> None:
         rect = self.rect
         pos = self.pos
         board_state = board.board_tiles
         out_w, out_h = rect
+        territory_state = territory_indicator.board_tiles if territory_indicator is not None else None
 
         # Draw the scaled board background
         scaled_board = pygame.transform.smoothscale(self.board_texture, (out_w, out_h))
@@ -185,8 +214,37 @@ class Drawer:
                 else:
                     screen.blit(stone_white_screen, (screen_draw_x, screen_draw_y))
 
+        # Draw territory indicator stones on top of the board stones
+        if territory_state is not None:
+            territory_stone_w_native = self.cell_w * self.territory_indicator_scale
+            territory_stone_h_native = self.cell_h * self.territory_indicator_scale
+            territory_stone_w_screen = territory_stone_w_native * scale_x
+            territory_stone_h_screen = territory_stone_h_native * scale_y
+
+            territory_black_screen = pygame.transform.smoothscale(
+                self.black_stone, (int(territory_stone_w_screen), int(territory_stone_h_screen))
+            )
+            territory_white_screen = pygame.transform.smoothscale(
+                self.white_stone, (int(territory_stone_w_screen), int(territory_stone_h_screen))
+            )
+
+            for row in range(self.board_height):
+                for col in range(self.board_width):
+                    space = territory_state[row][col]
+                    if space == BoardSpace.EMPTY:
+                        continue
+
+                    screen_draw_x, screen_draw_y = self.board_to_global_scaled(row, col, self.territory_indicator_scale)
+
+                    if space == BoardSpace.BLACK:
+                        indicator_stone = territory_black_screen.copy()
+                    else:
+                        indicator_stone = territory_white_screen.copy()
+
+                    screen.blit(indicator_stone, (screen_draw_x, screen_draw_y))
+
         # Draw hover stone if color is not EMPTY
-        if color != BoardSpace.EMPTY:
+        if hover_color != BoardSpace.EMPTY:
             hover_row, hover_col = hover_coords
             board_x, board_y = self.global_to_board(hover_row, hover_col)
             
@@ -196,19 +254,21 @@ class Drawer:
                     screen_draw_x, screen_draw_y = self.board_to_global(board_x, board_y)
                     
                     # Create semi-transparent stone
-                    if color == BoardSpace.BLACK:
+                    if hover_color == BoardSpace.BLACK:
                         hover_stone = stone_black_screen.copy()
                     else:
                         hover_stone = stone_white_screen.copy()
 
                     hover_stone.set_alpha(200)
                     screen.blit(hover_stone, (screen_draw_x, screen_draw_y))
+        
 
 
 
 if __name__ == "__main__":
     from gameSettings import GameSettings
     import random
+    from bouzy import BouzyAlgorithm
     pygame.init()
 
     WIDTH, HEIGHT = 800, 800
@@ -218,9 +278,53 @@ if __name__ == "__main__":
     s = 19
     board = Board(GameSettings(s))
 
-    for i in range(s):
-        for j in range(s):
-            board.board_tiles[i][j] = random.choice([BoardSpace.BLACK,BoardSpace.WHITE])
+    occupied: Set[Tuple[int, int]] = {(4, 5), (7, 5), (10, 10), (11, 10)}
+
+
+    def place_random_spread(
+        color: BoardSpace,
+        count: int = 8,
+        min_distance: int = 3
+    ) -> None:
+        candidates = [
+            (x, y)
+            for x in range(s)
+            for y in range(s)
+            if (x, y) not in occupied
+        ]
+        random.shuffle(candidates)
+
+        placed = 0
+
+        for x, y in candidates:
+            if placed >= count:
+                break
+
+            if all(
+                abs(x - ox) + abs(y - oy) >= min_distance
+                for ox, oy in occupied
+            ):
+                board.place_stone(x, y, color)
+                occupied.add((x, y))
+                placed += 1
+
+    place_random_spread(BoardSpace.BLACK, count=20)
+    place_random_spread(BoardSpace.WHITE, count=20)
+
+    values: List[List[int]] = (
+        BouzyAlgorithm.evaluate_values(
+            board,
+            dilations=4
+        )
+    )
+
+    territory_board: Board = (
+        BouzyAlgorithm.evaluate_territory_board(
+            board=board,
+            dilations=21,
+            erosions=5
+        )
+    )
 
     drawer = Drawer(
         board_width=s,
@@ -243,7 +347,8 @@ if __name__ == "__main__":
             board=board,
             screen=screen,
             hover_coords=(0,0),
-            color=BoardSpace.EMPTY
+            hover_color=BoardSpace.EMPTY,
+            territory_indicator=territory_board
         )
 
         pygame.display.flip()
