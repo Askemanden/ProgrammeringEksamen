@@ -1,4 +1,4 @@
-import WindowPartitioner as Windgpfyks
+import windowPartitioner as Windgpfyks
 import pygame as pg
 from signals import Signal
 from typing import Tuple, Any, List
@@ -29,6 +29,7 @@ def switch_state(state : States):
     global ui_managler
     ui_managler.switch_menu(0)
     ui_managler.esc_menu = False
+    update_score()
 
 def about():
     global game
