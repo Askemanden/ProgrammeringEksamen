@@ -26,6 +26,7 @@ class BouzyAlgorithm:
         """
 
         if erosions is None:
+            # Usual fomula for erosion number
             erosions = dilations * (dilations - 1) + 1
 
         values: List[List[int]] = (
@@ -329,6 +330,7 @@ class BouzyAlgorithm:
 
         return value
 
+    
 
 if __name__ == "__main__":
 
