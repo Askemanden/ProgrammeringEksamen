@@ -1,4 +1,4 @@
-import windowPartitioner as Windgpfyks
+import WindowPartitioner as Windgpfyks
 import pygame as pg
 from signals import Signal
 from typing import Tuple, Any
@@ -84,7 +84,7 @@ if __name__ == "__main__":
                     game.current_state = States.SPIL_INKAKTIVT
                 elif event.key == pg.K_i:
                     game.current_state = States.HOVEVD_MUEN
-                elif event.key == pg.K_ESCAPE:
+                elif event.key == pg.K_ESCAPE and game.current_state != States.HOVEVD_MUEN:
                     ui_managler.esc_menu = not ui_managler.esc_menu
             if (ui_managler.esc_menu):
                 ui_managler.esc_event_handling(event)
