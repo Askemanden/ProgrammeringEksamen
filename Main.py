@@ -1,7 +1,7 @@
 import WindowPartitioner as Windgpfyks
 import pygame as pg
 from signals import Signal
-from typing import Tuple, Any
+from typing import Tuple, Any, List
 from drawer import Drawer
 from Board import Board, specielt_bræt
 from gameSettings import GameSettings
@@ -9,6 +9,9 @@ from game import Game
 from game import States
 
 instance_active : bool = True
+
+sizes : List[int] = [19, 13, 9]
+current_size_setting : int = 13
 
 def quit():
     global instance_active
@@ -28,16 +31,36 @@ def about():
     ui_managler.esc_menu = False
     ui_managler.switch_menu(1)
 
+def options():
+    global game
+    game.current_state = States.HOVEVD_MUEN
+    global ui_managler
+    ui_managler.esc_menu = False
+    ui_managler.switch_menu(2)
+
 def toggle_esc_menu():
     global ui_managler
     ui_managler.esc_menu = not ui_managler.esc_menu
+
+def size_settings(size_index : int):
+    global current_size_setting
+    current_size_setting = sizes[size_index]
+    global board
+    board = Board(GameSettings(current_size_setting))
+    global drawer
+    drawer = Drawer(current_size_setting,current_size_setting,(WINDOW_HEIGHT-100,WINDOW_HEIGHT-100),(50,50), margin=50)
+    print("Ændret brætstørrelse til noget")
 
 El_capone: dict[str, Any] = {
     "quit":quit,
     "main_menu": lambda: switch_state(States.HOVEVD_MUEN),
     "start_game": lambda: switch_state(States.SPIL_AKTIVIT),
     "about": about,
+    "settings": options,
     "toggle_esc_menu": toggle_esc_menu,
+    "19x19": lambda: size_settings(0),
+    "13x13": lambda: size_settings(1),
+    "9x9": lambda: size_settings(2),
 }
 
 if __name__ == "__main__":
@@ -50,11 +73,11 @@ if __name__ == "__main__":
     screen = pg.display.set_mode((WINDOW_WIDTH,WINDOW_HEIGHT), pg.RESIZABLE)
     pg.display.set_caption("Tingeling")
     clock = pg.time.Clock()
-    board_size = 5
-    settings = GameSettings(board_size)
-    drawer = Drawer(board_size,board_size,(WINDOW_HEIGHT-100,WINDOW_HEIGHT-100),(50,50), margin=50)
+
+    settings = GameSettings(current_size_setting)
+    drawer = Drawer(current_size_setting,current_size_setting,(WINDOW_HEIGHT-100,WINDOW_HEIGHT-100),(50,50), margin=50)
     
-    board = Board(settings, specielt_bræt)
+    board = Board(settings)
 
     player_action: Signal[Tuple[int,int]] = Signal[Tuple[int,int]]()
 
