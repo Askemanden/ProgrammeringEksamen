@@ -1,7 +1,7 @@
 from typing import Final, List, Optional, Set, Tuple
 from copy import deepcopy
 
-from board import Board, BoardSpace
+from Board import Board, BoardSpace
 from gameSettings import GameSettings
 import random
 
