@@ -1,4 +1,4 @@
-import WindowPartitioner
+import WindowPartitioner as Windgpfyks
 import pygame as pg
 from signals import Signal
 from typing import Tuple, List
@@ -8,13 +8,35 @@ from gameSettings import GameSettings
 from game import Game
 from game import States
 
-def start_stop():
-    game.running = not game.running
+instance_active : bool = True
+
+def quit():
+    global instance_active
+    instance_active = False
+
+def switch_state(state : States):
+    global game
+    game.current_state = state
+    global ui_managler
+    ui_managler.esc_menu = False
+
+def toggle_esc_menu():
+    global ui_managler
+    ui_managler.esc_menu = not ui_managler.esc_menu
+
+El_capone = {
+    "quit":quit,
+    "main_menu": lambda: switch_state(States.HOVEVD_MUEN),
+    "start_game": lambda: switch_state(States.SPIL_AKTIVIT),
+    "toggle_esc_menu": toggle_esc_menu,
+}
 
 if __name__ == "__main__":
 
-    WINDOW_WIDTH = 800
+    WINDOW_WIDTH = 1600
     WINDOW_HEIGHT = 800
+    pg.init()
+    pg.font.init()
 
     screen = pg.display.set_mode((WINDOW_WIDTH,WINDOW_HEIGHT), pg.RESIZABLE)
     pg.display.set_caption("Tingeling")
@@ -29,10 +51,12 @@ if __name__ == "__main__":
 
     game = Game(board,drawer,player_action)
 
+    ui_managler = Windgpfyks.Game(El_capone)
+    ui_managler.load_menus("menu.json")
+
     game.start_game()
     game.current_state = States.HOVEVD_MUEN
 
-    instance_active : bool = True
     while instance_active:
         for event in pg.event.get():
             if event.type == pg.QUIT:
@@ -49,18 +73,32 @@ if __name__ == "__main__":
                     game.current_state = States.SPIL_AKTIVIT
                 elif event.key == pg.K_o:
                     game.current_state = States.SPIL_INKAKTIVT
+                elif event.key == pg.K_i:
+                    game.current_state = States.HOVEVD_MUEN
+                elif event.key == pg.K_ESCAPE:
+                    ui_managler.esc_menu = not ui_managler.esc_menu
+            if (ui_managler.esc_menu):
+                ui_managler.esc_event_handling(event)
+            elif (game.current_state == States.HOVEVD_MUEN):
+                ui_managler.menu_event_handling(event)
+
         mouse_pos = pg.mouse.get_pos()
         
         if game.current_state == States.HOVEVD_MUEN:
             # Tegn hovedmenuen.
-            pass
+            pg.Surface.fill(screen, (38, 206, 253))
+            ui_managler.update()
+            ui_managler.draw(screen)
+
         elif game.current_state == States.SPIL_INKAKTIVT:
             mouse_pos = (-470032, -432876234)
+            drawer.draw(board,screen, mouse_pos,game.current_turn)
         elif game.current_state == States.SPIL_AKTIVIT:
-            pass
-        
-        drawer.draw(board,screen, mouse_pos,game.current_turn)
+            drawer.draw(board,screen, mouse_pos,game.current_turn)
 
+        if (ui_managler.esc_menu):
+            ui_managler.esc_update()
+            ui_managler.esc_draw(screen)
 
         pg.display.flip()
         clock.tick(34)

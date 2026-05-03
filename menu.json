@@ -1,0 +1,256 @@
+{
+    "screen_boxes": [
+        {
+            "color_info": [
+                196,
+                196,
+                196,
+                160,
+                160,
+                180,
+                37,
+                68,
+                147
+            ],
+            "placement_info": [
+                800,
+                300,
+                700,
+                400,
+                "center",
+                "center"
+            ],
+            "components": [
+                {
+                    "color_info": [
+                        0,
+                        167,
+                        225,
+                        22,
+                        124,
+                        198,
+                        134,
+                        189,
+                        0
+                    ],
+                    "visible": true,
+                    "placement_info": null,
+                    "text": "overlay",
+                    "text_size": 20,
+                    "button_function_id": "toggle_esc_menu"
+                },
+                {
+                    "color_info": [
+                        0,
+                        167,
+                        225,
+                        22,
+                        124,
+                        198,
+                        134,
+                        189,
+                        0
+                    ],
+                    "visible": true,
+                    "placement_info": [
+                        0,
+                        80,
+                        250,
+                        50,
+                        "center",
+                        "center"
+                    ],
+                    "text": "Start Spil",
+                    "text_size": 20,
+                    "button_function_id": "start_game"
+                },
+                {
+                    "color_info": [
+                        0,
+                        167,
+                        225,
+                        22,
+                        124,
+                        198,
+                        134,
+                        189,
+                        0
+                    ],
+                    "visible": true,
+                    "placement_info": null,
+                    "text": "Primaterne bag programmet",
+                    "text_size": 20,
+                    "button_function_id": "about"
+                },
+                {
+                    "color_info": null,
+                    "visible": true,
+                    "placement_info": [
+                        0,
+                        20,
+                        140,
+                        0,
+                        "center",
+                        "Askeslaske"
+                    ],
+                    "text": "GO - spil",
+                    "text_size": 60,
+                    "button_function_id": null
+                },
+                {
+                    "color_info": null,
+                    "visible": true,
+                    "placement_info": [
+                        0,
+                        100,
+                        140,
+                        0,
+                        "center",
+                        "Askeslaske"
+                    ],
+                    "text": "a Slaske(inc) production",
+                    "text_size": 18,
+                    "button_function_id": null
+                }
+            ]
+        }
+    ],
+    "esc_menu": [
+        {
+            "color_info": [
+                196,
+                196,
+                196,
+                16,
+                106,
+                34,
+                37,
+                68,
+                147
+            ],
+            "placement_info": [
+                800,
+                400,
+                600,
+                400,
+                "center",
+                "center"
+            ],
+            "components": [
+                {
+                    "color_info": null,
+                    "visible": true,
+                    "placement_info": null,
+                    "text": "luk",
+                    "text_size": 20,
+                    "button_function_id": "toggle_esc_menu"
+                },
+                {
+                    "color_info": null,
+                    "visible": true,
+                    "placement_info": null,
+                    "text": "Bomb Venezuela",
+                    "text_size": 20,
+                    "button_function_id": "Bomb_Venezuela"
+                },
+                {
+                    "color_info": null,
+                    "visible": true,
+                    "placement_info": null,
+                    "text": "Hovedmenu",
+                    "text_size": 20,
+                    "button_function_id": "main_menu"
+                },
+                {
+                    "color_info": null,
+                    "visible": true,
+                    "placement_info": null,
+                    "text": "Afslut",
+                    "text_size": 20,
+                    "button_function_id": "quit"
+                },
+                {
+                    "color_info": [
+                        255,
+                        255,
+                        255,
+                        130,
+                        130,
+                        130,
+                        100,
+                        50,
+                        50
+                    ],
+                    "visible": false,
+                    "placement_info": [
+                        0,
+                        -40,
+                        300,
+                        150,
+                        "center",
+                        "center"
+                    ],
+                    "text": "Menu",
+                    "text_size": 80,
+                    "button_function_id": null
+                }
+            ]
+        }
+    ],
+    "hud": [
+        {
+            "color_info": [
+                49,
+                50,
+                51,
+                16,
+                106,
+                34,
+                37,
+                68,
+                147
+            ],
+            "placement_info": [
+                150,
+                700,
+                200,
+                130,
+                "Askeslaske",
+                "Askeslaske"
+            ],
+            "border" : false,
+            "components": [
+                {
+                    "color_info": null,
+                    "visible": true,
+                    "placement_info": [
+                        0,
+                        30,
+                        180,
+                        50,
+                        "center",
+                        "center"
+                    ],
+                    "text": "Afslut",
+                    "text_size": 30,
+                    "button_function_id": "quit"
+                },
+                {
+                    "color_info": null,
+                    "visible": true,
+                    "placement_info": [
+                        0,
+                        -30,
+                        180,
+                        50,
+                        "center",
+                        "center"
+                    ],
+                    "text": "Ny spil",
+                    "text_size": 30,
+                    "button_function_id": "start_game"
+                }
+            ]
+        }
+    ]
+}
