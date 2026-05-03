@@ -1,7 +1,7 @@
-import WindowPartitioner as Windgpfyks
+import windowPartitioner as Windgpfyks
 import pygame as pg
 from signals import Signal
-from typing import Tuple, List
+from typing import Tuple, Any
 from drawer import Drawer
 from Board import Board, specielt_bræt
 from gameSettings import GameSettings
@@ -24,7 +24,7 @@ def toggle_esc_menu():
     global ui_managler
     ui_managler.esc_menu = not ui_managler.esc_menu
 
-El_capone = {
+El_capone: dict[str, Any] = {
     "quit":quit,
     "main_menu": lambda: switch_state(States.HOVEVD_MUEN),
     "start_game": lambda: switch_state(States.SPIL_AKTIVIT),
