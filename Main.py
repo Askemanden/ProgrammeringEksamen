@@ -28,12 +28,13 @@ El_capone: dict[str, Any] = {
     "quit":quit,
     "main_menu": lambda: switch_state(States.HOVEVD_MUEN),
     "start_game": lambda: switch_state(States.SPIL_AKTIVIT),
+    "about": lambda: switch_state(States.HOVEVD_MUEN),
     "toggle_esc_menu": toggle_esc_menu,
 }
 
 if __name__ == "__main__":
 
-    WINDOW_WIDTH = 1600
+    WINDOW_WIDTH = 800
     WINDOW_HEIGHT = 800
     pg.init()
     pg.font.init()
@@ -91,9 +92,11 @@ if __name__ == "__main__":
             ui_managler.draw(screen)
 
         elif game.current_state == States.SPIL_INKAKTIVT:
+            pg.Surface.fill(screen, (0, 0, 0))
             mouse_pos = (-470032, -432876234)
             drawer.draw(board,screen, mouse_pos,game.current_turn)
         elif game.current_state == States.SPIL_AKTIVIT:
+            pg.Surface.fill(screen, (0, 0, 0))
             drawer.draw(board,screen, mouse_pos,game.current_turn)
 
         if (ui_managler.esc_menu):
