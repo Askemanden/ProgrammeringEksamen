@@ -35,7 +35,7 @@
                     ],
                     "visible": true,
                     "placement_info": null,
-                    "text": "Start Spil",
+                    "text": "Fortsæt Spil",
                     "text_size": 20,
                     "button_function_id": "start_game"
                 },
@@ -56,24 +56,6 @@
                     "text": "Primaterne bag programmet",
                     "text_size": 20,
                     "button_function_id": "about"
-                },
-                {
-                    "color_info": [
-                        0,
-                        167,
-                        225,
-                        22,
-                        124,
-                        198,
-                        134,
-                        189,
-                        0
-                    ],
-                    "visible": true,
-                    "placement_info": null,
-                    "text": "Indstillinger",
-                    "text_size": 20,
-                    "button_function_id": "settings"
                 },
                 {
                     "color_info": null,
@@ -104,7 +86,88 @@
                     "text": "a Slaske(inc) production",
                     "text_size": 18,
                     "button_function_id": null
+                },
+                {
+                    "color_info": [
+                    196,
+                    196,
+                    196,
+                    160,
+                    160,
+                    180,
+                    37,
+                    68,
+                    147
+                    ],
+                    "visible": true,
+                    "placement_info": [
+                        -90,
+                        165,
+                        150,
+                        0,
+                        "center",
+                        "Askeslaske"
+                    ],
+                    "text": "test tekst",
+                    "text_size": 20,
+                    "button_function_id": null
+                },
+                {
+                    "color_info": [
+                    196,
+                    196,
+                    196,
+                    160,
+                    160,
+                    180,
+                    37,
+                    68,
+                    147
+                    ],
+                    "visible": true,
+                    "placement_info": [
+                        90,
+                        165,
+                        150,
+                        0,
+                        "center",
+                        "Askeslaske"
+                    ],
+                    "text": "test tekst",
+                    "text_size": 20,
+                    "button_function_id": null
+                },
+                {
+                    "color_info": null,
+                    "visible": true,
+                    "placement_info": [
+                        -90,
+                        140,
+                        150,
+                        0,
+                        "center",
+                        "Askeslaske"
+                    ],
+                    "text": "Hvid score:",
+                    "text_size": 25,
+                    "button_function_id": null
+                },
+                {
+                    "color_info": null,
+                    "visible": true,
+                    "placement_info": [
+                        90,
+                        140,
+                        150,
+                        0,
+                        "center",
+                        "Askeslaske"
+                    ],
+                    "text": "Sort score:",
+                    "text_size": 25,
+                    "button_function_id": null
                 }
+
             ]
         },
         {
@@ -284,6 +347,31 @@
                     "button_function_id": "9x9"
                 },
                 {
+                    "color_info": [
+                        0,
+                        167,
+                        225,
+                        22,
+                        124,
+                        198,
+                        134,
+                        189,
+                        0
+                    ],
+                    "visible": true,
+                    "placement_info": [
+                        0,
+                        60,
+                        400,
+                        50,
+                        "center",
+                        "center"
+                    ],
+                    "text": "Tilbage",
+                    "text_size": 20,
+                    "button_function_id": "main_menu"
+                },
+                {
                     "color_info": null,
                     "visible": true,
                     "placement_info": [
@@ -424,9 +512,9 @@
                         "center",
                         "center"
                     ],
-                    "text": "Start spil",
+                    "text": "Nyt Spil",
                     "text_size": 30,
-                    "button_function_id": "start_game"
+                    "button_function_id": "new_game"
                 }
             ]
         }

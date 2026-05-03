@@ -3,7 +3,7 @@ import pygame as pg
 from signals import Signal
 from typing import Tuple, Any, List
 from drawer import Drawer
-from Board import Board, specielt_bræt
+from Board import Board
 from gameSettings import GameSettings
 from game import Game
 from game import States
@@ -12,6 +12,12 @@ instance_active : bool = True
 
 sizes : List[int] = [19, 13, 9]
 current_size_setting : int = 13
+
+game_active : bool = False
+making_new_game : bool = False
+
+white_score : int = 0
+black_score : int = 0
 
 def quit():
     global instance_active
@@ -31,7 +37,7 @@ def about():
     ui_managler.esc_menu = False
     ui_managler.switch_menu(1)
 
-def options():
+def new_game():
     global game
     game.current_state = States.HOVEVD_MUEN
     global ui_managler
@@ -49,14 +55,32 @@ def size_settings(size_index : int):
     board = Board(GameSettings(current_size_setting))
     global drawer
     drawer = Drawer(current_size_setting,current_size_setting,(WINDOW_HEIGHT-100,WINDOW_HEIGHT-100),(50,50), margin=50)
+    global game
+    global player_action
+    game = Game(board,drawer,player_action)
     print("Ændret brætstørrelse til noget")
+    global game_active
+    game_active = True
+    game.start_game()
+    switch_state(States.SPIL_AKTIVIT)
+
+def continue_game():
+    global game_active
+    if (game_active):
+        switch_state(States.SPIL_AKTIVIT)
+
+def update_score():
+    global ui_managler
+    ui_managler.menus[0].components[4].text.text = f"{white_score}"
+    ui_managler.menus[0].components[5].text.text = f"{black_score}"
 
 El_capone: dict[str, Any] = {
     "quit":quit,
     "main_menu": lambda: switch_state(States.HOVEVD_MUEN),
-    "start_game": lambda: switch_state(States.SPIL_AKTIVIT),
+    "start_game": continue_game,
+    "new_game" : new_game,
     "about": about,
-    "settings": options,
+    "settings": new_game,
     "toggle_esc_menu": toggle_esc_menu,
     "19x19": lambda: size_settings(0),
     "13x13": lambda: size_settings(1),
@@ -85,6 +109,7 @@ if __name__ == "__main__":
 
     ui_managler = Windgpfyks.Game(El_capone)
     ui_managler.load_menus("menu.json")
+    update_score()
 
     game.start_game()
     game.current_state = States.HOVEVD_MUEN
