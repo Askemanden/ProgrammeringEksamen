@@ -7,16 +7,31 @@ class BoardSpace(Enum):
     BLACK = 2
     EMPTY = 3
 
-class BoardPosition:
-    def __init__(self, x : int, y : int):
-        self.x = x
-        self.y = y
+class Group:
+    def __init__(self, colour : BoardSpace, members : List[Tuple[int, int]]):
+        self.colour = colour
+        self.members : List[Tuple[int, int]] = members
 
 class Board:
-    def __init__(self, settings : _GameSettings) -> None:
+    def __init__(self, settings : _GameSettings, premade_board_pos : List[List[BoardSpace]] = []) -> None:
         self.settings : _GameSettings = settings
 
-        self.board_tiles : List[List[BoardSpace]] = self.__populate_board_tiles()
+        if (len(premade_board_pos) != self.settings.board_size):
+            self.board_tiles : List[List[BoardSpace]] = self.__populate_board_tiles()
+            print("standardbræt oprettet")
+        else:
+                # Det korrekte antal kolonner er til stede.
+            self.succes = True
+            for i in range(len(premade_board_pos)):
+                if(len(premade_board_pos[i]) != self.settings.board_size):
+                    self.succes = False
+                    break
+            if (self.succes):
+                self.board_tiles : List[List[BoardSpace]] = premade_board_pos
+                print("Specielt bræt oprettet")
+            else:
+                self.board_tiles : List[List[BoardSpace]] = self.__populate_board_tiles()
+                print("Bræt givet af forkert størrelse | Standardbræt oprettet")
 
         self.last_placed_stone : Tuple[BoardSpace, Tuple[int,int]] = (BoardSpace.EMPTY,(0,0))
 
@@ -36,23 +51,6 @@ class Board:
             return True
         return False
     
-    def __check_legality(self, x : int, y : int, colour : BoardSpace) -> bool:
-        return True
-
-    def __check_captures(self, x : int, y : int, colour : BoardSpace) -> bool:
-        if (self.__out_of_bounds(x, y)):
-            return False
-        # Ånde-først søgealgoritme
-        
-        BoardPosition : source(x, y)
-
-        queueueueueueue : List[Tuple[int, int]] = []
-        visited : List[Tuple[int, int]] = []
-
-
-    
-        return True
-
     def place_stone(self, x : int, y : int, stone : BoardSpace) -> bool:
         if (self.__out_of_bounds(x, y)):
             return False
@@ -67,26 +65,50 @@ class Board:
             return False
         self.board_tiles[x][y] = BoardSpace.EMPTY
         return True
-
-    def check_captures(self):...
-
     
-# Kodegravplads
-
-"""
-    def _identify_group(self, x : int, y : int) -> List[Tuple[int, int]]:
-        if (self.__out_of_bounds(x, y)):
-            return [(-1, -1)]
-        group : List[Tuple[int, int]] = []
+    def find_groups(self):
         
-        iterations : int = 0; _x : int = x; _y : int = y
-        search : bool = True
-        while (search or iterations < 100):
+        first_stone = True
 
-            # Ånde-først søgealgoritme
+        found_groups : List[Group] = []
 
-            group.append((_x, _y))
+        for _y in range(self.settings.board_size):
+            for _x in range(self.settings.board_size):
+                if (first_stone):
+                    if (self.board_tiles[_x][_y] == BoardSpace.EMPTY):
+                        continue
+                    start_group = Group(self.board_tiles[_x][_y], [(_x, _y)])
+                    found_groups.append(start_group)
+                    first_stone = False
 
-            iterations = iterations + 1
-        return group
+                    # Tjek nabo
+                if (self.board_tiles[_x - 1][_y] == self.board_tiles[_x][_y]):
+                        # Nabo i x retningen er ens farve.
+                    pass
+
+specielt_bræt = [
+    [BoardSpace.BLACK, BoardSpace.BLACK, BoardSpace.BLACK, BoardSpace.EMPTY, BoardSpace.EMPTY],
+    [BoardSpace.EMPTY, BoardSpace.BLACK, BoardSpace.EMPTY, BoardSpace.EMPTY, BoardSpace.EMPTY],
+    [BoardSpace.EMPTY, BoardSpace.EMPTY, BoardSpace.EMPTY, BoardSpace.EMPTY, BoardSpace.EMPTY],
+    [BoardSpace.EMPTY, BoardSpace.EMPTY, BoardSpace.EMPTY, BoardSpace.EMPTY, BoardSpace.EMPTY],
+    [BoardSpace.EMPTY, BoardSpace.EMPTY, BoardSpace.EMPTY, BoardSpace.EMPTY, BoardSpace.EMPTY]
+]
+
 """
+class BoardPosition:    # En klasse til at sørge for at alle koordinater er gyldige
+    def __init__(self, x : int, y : int, board_class_ptr : Board):
+
+        if (x < board_class_ptr.settings.board_size and x >= 0):
+            self.x = x
+        else:
+            self.x = 0
+        if (y < board_class_ptr.settings.board_size and y >= 0):
+            self.y = y
+        else:
+            self.y = 0
+"""
+
+if __name__ == "__main__":
+    size = _GameSettings(5)
+
+    bræt = Board(size, specielt_bræt)

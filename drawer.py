@@ -89,7 +89,7 @@ class Drawer:
 
     def board_to_global(self, row: int, col: int) -> Tuple[float, float]:
         """
-        Convert board coordinates (row, col) to global screen coordinates for stone drawing.
+        Convert board coordinates (row, column) to global screen coordinates for stone drawing.
         Returns the top-left position for blitting the stone image on screen.
         """
         rect = self.rect

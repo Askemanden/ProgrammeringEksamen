@@ -2,8 +2,14 @@ from board import Board, BoardSpace
 from signals import Signal
 from typing import Tuple
 from drawer import Drawer
+from enum import Enum
 
 Player = BoardSpace
+
+class States(Enum):
+    HOVEVD_MUEN = 0
+    SPIL_INKAKTIVT = 1
+    SPIL_AKTIVIT = 2
 
 class Game:
 
@@ -16,9 +22,14 @@ class Game:
         self.last_turn : Player = Player.EMPTY
 
         self.player_actions.connect(lambda position: self.__on_player_action(position))
+
+        self.running = False
+        self.current_state : States = States.HOVEVD_MUEN
     
     def __on_player_action(self, position: Tuple[int,int]) -> None:
-        
+        if (not self.running):
+            return
+
         if self.current_turn == Player.EMPTY:
             return
 
@@ -33,11 +44,10 @@ class Game:
 
         self.current_turn = Player.BLACK if self.current_turn == Player.WHITE else Player.WHITE
 
-
-
     def pause_unpause(self) -> None:
         self.current_turn = Player.EMPTY if self.current_turn != Player.EMPTY else self.last_turn
 
     def start_game(self) -> None:
+        self.running = True
         self.current_turn = Player.BLACK
         self.last_turn = Player.WHITE
