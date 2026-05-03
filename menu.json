@@ -88,6 +88,107 @@
                     "button_function_id": null
                 }
             ]
+        },
+         {
+            "color_info": [
+                196,
+                196,
+                196,
+                160,
+                160,
+                180,
+                37,
+                68,
+                147
+            ],
+            "placement_info": [
+                400,
+                300,
+                600,
+                300,
+                "center",
+                "center"
+            ],
+            "components": [
+                {
+                    "color_info": [
+                        0,
+                        167,
+                        225,
+                        22,
+                        124,
+                        198,
+                        134,
+                        189,
+                        0
+                    ],
+                    "visible": true,
+                    "placement_info": null,
+                    "text": "Tilbage",
+                    "text_size": 20,
+                    "button_function_id": "main_menu"
+                },
+                {
+                    "color_info": null,
+                    "visible": true,
+                    "placement_info": [
+                        0,
+                        20,
+                        140,
+                        0,
+                        "center",
+                        "Askeslaske"
+                    ],
+                    "text": "GO - spil",
+                    "text_size": 60,
+                    "button_function_id": null
+                },
+                {
+                    "color_info": null,
+                    "visible": true,
+                    "placement_info": [
+                        0,
+                        100,
+                        140,
+                        0,
+                        "center",
+                        "Askeslaske"
+                    ],
+                    "text": "a Slaske(inc) production",
+                    "text_size": 18,
+                    "button_function_id": null
+                },
+                {
+                    "color_info": null,
+                    "visible": true,
+                    "placement_info": [
+                        0,
+                        140,
+                        140,
+                        0,
+                        "center",
+                        "Askeslaske"
+                    ],
+                    "text": "Jacob Fischer Bak",
+                    "text_size": 25,
+                    "button_function_id": null
+                },
+                 {
+                    "color_info": null,
+                    "visible": true,
+                    "placement_info": [
+                        0,
+                        180,
+                        140,
+                        0,
+                        "center",
+                        "Askeslaske"
+                    ],
+                    "text": "Aske Vandsø Aremark",
+                    "text_size": 25,
+                    "button_function_id": null
+                }
+            ]
         }
     ],
     "esc_menu": [

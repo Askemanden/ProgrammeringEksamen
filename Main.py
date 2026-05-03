@@ -18,7 +18,15 @@ def switch_state(state : States):
     global game
     game.current_state = state
     global ui_managler
+    ui_managler.switch_menu(0)
     ui_managler.esc_menu = False
+
+def about():
+    global game
+    game.current_state = States.HOVEVD_MUEN
+    global ui_managler
+    ui_managler.esc_menu = False
+    ui_managler.switch_menu(1)
 
 def toggle_esc_menu():
     global ui_managler
@@ -28,7 +36,7 @@ El_capone = {
     "quit":quit,
     "main_menu": lambda: switch_state(States.HOVEVD_MUEN),
     "start_game": lambda: switch_state(States.SPIL_AKTIVIT),
-    "about": lambda: switch_state(States.HOVEVD_MUEN),
+    "about": about,
     "toggle_esc_menu": toggle_esc_menu,
 }
 
@@ -66,7 +74,7 @@ if __name__ == "__main__":
             elif event.type == pg.VIDEORESIZE:
                 # Update screen size when resized
                 screen = pg.display.set_mode((event.w, event.h), pg.RESIZABLE)
-            elif event.type == pg.MOUSEBUTTONDOWN:
+            elif event.type == pg.MOUSEBUTTONDOWN and not ui_managler.esc_menu:
                 if event.button == 1:  # 1 = Left click, 2 = Middle, 3 = Right
                     player_action.emit(event.pos)
             elif event.type == pg.KEYDOWN:
