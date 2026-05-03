@@ -2,7 +2,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Tuple, Optional, Set, List
 import pygame
-from board import BoardSpace, Board
+from Board import BoardSpace, Board
 
 
 
