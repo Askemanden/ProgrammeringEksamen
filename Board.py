@@ -79,7 +79,6 @@ class Board:
                         continue
                     start_group = Group(self.board_tiles[_x][_y], [(_x, _y)])
                     found_groups.append(start_group)
-                    first_stone = False
 
                     # Tjek nabo
                 if (self.board_tiles[_x - 1][_y] == self.board_tiles[_x][_y]):
