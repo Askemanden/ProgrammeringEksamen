@@ -102,7 +102,7 @@
                     "visible": true,
                     "placement_info": [
                         -90,
-                        165,
+                        185,
                         150,
                         0,
                         "center",
@@ -127,7 +127,7 @@
                     "visible": true,
                     "placement_info": [
                         90,
-                        165,
+                        185,
                         150,
                         0,
                         "center",
@@ -142,7 +142,7 @@
                     "visible": true,
                     "placement_info": [
                         -90,
-                        140,
+                        160,
                         150,
                         0,
                         "center",
@@ -157,7 +157,7 @@
                     "visible": true,
                     "placement_info": [
                         90,
-                        140,
+                        160,
                         150,
                         0,
                         "center",
@@ -166,7 +166,23 @@
                     "text": "Sort score:",
                     "text_size": 25,
                     "button_function_id": null
+                },
+                {
+                    "color_info": null,
+                    "visible": true,
+                    "placement_info": [
+                        0,
+                        130,
+                        150,
+                        0,
+                        "center",
+                        "Askeslaske"
+                    ],
+                    "text": "Sidste spils resultater",
+                    "text_size": 25,
+                    "button_function_id": null
                 }
+
 
             ]
         },

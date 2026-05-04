@@ -34,6 +34,9 @@ class Board:
 
         self.previous_board_state: List[List[BoardSpace]]
 
+        self.white_captures = 0
+        self.black_captures = 0
+
         if premade_board_pos is None:
             premade_board_pos = []
 
@@ -176,7 +179,10 @@ class Board:
         self,
         group: Group
     ) -> None:
-
+        if group.colour == BoardSpace.WHITE:
+            self.black_captures += len(group.members)
+        else:
+            self.white_captures += len(group.members)
         for x, y in group.members:
             self.board_tiles[x][y] = BoardSpace.EMPTY
 
@@ -315,6 +321,47 @@ class Board:
             print(row)
 
         print()
+
+def calculate_score(
+    original_board: Board,
+    territory_board: Board
+) -> Tuple[int, int]:
+
+    black_score: int = 0
+
+    white_score: int = 0
+
+    x: int
+    y: int
+
+    for x in range(original_board.settings.board_size):
+
+        for y in range(original_board.settings.board_size):
+
+            original_space: BoardSpace = (
+                original_board.board_tiles[x][y]
+            )
+
+            territory_space: BoardSpace = (
+                territory_board.board_tiles[x][y]
+            )
+
+            # Ignore spaces already occupied by stones.
+            # We only count territory.
+            if original_space != BoardSpace.EMPTY:
+                continue
+
+            if territory_space == BoardSpace.BLACK:
+                black_score += 1
+
+            elif territory_space == BoardSpace.WHITE:
+                white_score += 1
+
+    white_score += original_board.white_captures
+    black_score += original_board.black_captures
+
+    return (black_score, white_score)
+
 
 
 specielt_bræt: List[List[BoardSpace]] = [
