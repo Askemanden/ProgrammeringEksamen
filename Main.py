@@ -14,7 +14,6 @@ sizes : List[int] = [19, 13, 9]
 current_size_setting : int = 13
 
 game_active : bool = False
-making_new_game : bool = False
 
 white_score : int = 0
 black_score : int = 0
