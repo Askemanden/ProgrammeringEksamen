@@ -60,8 +60,7 @@ def size_settings(size_index : int):
     global game
     global player_action
     game = Game(board,drawer,player_action)
-    global score_board
-    score_board = Board(settings)
+    score_board = None
     print("Ændret brætstørrelse til noget")
     global game_active
     game_active = True
@@ -112,7 +111,7 @@ if __name__ == "__main__":
 
     game = Game(board,drawer,player_action)
 
-    score_board = Board(settings)
+    score_board = None
 
     ui_manager = Windgpfyks.Game(El_capone)
     ui_manager.load_menus("menu.json")
@@ -132,7 +131,7 @@ if __name__ == "__main__":
             elif event.type == pg.MOUSEBUTTONDOWN and not ui_manager.esc_menu:
                 if event.button == 1:  # 1 = Left click, 2 = Middle, 3 = Right
                     player_action.emit(event.pos)
-                    score_board = Board(settings)
+                    score_board = None
             elif event.type == pg.KEYDOWN:
                 if event.key == pg.K_p:
                     game.current_state = States.GAME_ACTIVE
