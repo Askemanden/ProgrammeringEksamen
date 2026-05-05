@@ -109,10 +109,4 @@ classDiagram
     Game --> Signal
     Game --> BoardSpace
     Game --> States
-    class calculate_score {
-        <<function>>
-        +calculate_score(original_board, territory_board)
-    }
-    calculate_score --> Board
-    calculate_score --> BoardSpace
 ```
