@@ -34,8 +34,8 @@ classDiagram
         -__board_equals(board_a, board_b)
         -__get_opposite_colour(stone)
     }
-    Board --> GameSettings
-    Board --> BoardSpace
+    Board --* GameSettings
+    Board --* BoardSpace
     Board --> Group
     class BouzyAlgorithm {
         +int BLACK_VALUE
@@ -49,9 +49,8 @@ classDiagram
         -__get_neighbour_values(values, x, y)
         -__clamp(value)
     }
-    BouzyAlgorithm --> Board
+    BouzyAlgorithm ..> Board
     BouzyAlgorithm --> BoardSpace
-    BouzyAlgorithm --> GameSettings
     class Signal {
         -List[Callable] _subscribers
         +__init__()
@@ -81,7 +80,7 @@ classDiagram
         +board_to_global_scaled(row, col, scale)
         +draw(board, screen, hover_coords, hover_color, territory_indicator)
     }
-    Drawer --> Board
+    Drawer ..> Board
     Drawer --> BoardSpace
     class States {
         <<enumeration>>
@@ -104,9 +103,9 @@ classDiagram
         -__switch_turn()
         -__on_player_action(position)
     }
-    Game --> Board
-    Game --> Drawer
-    Game --> Signal
+    Game --* Board
+    Game --* Drawer
+    Game --* Signal
     Game --> BoardSpace
     Game --> States
 ```
